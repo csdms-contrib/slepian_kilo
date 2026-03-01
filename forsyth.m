@@ -36,7 +36,7 @@ function varargout=forsyth(Te,lbd,f,rc,drho,T);
 %
 % forsyth('demo')
 %
-% Last modified by fjsimons-at-alum.mit.edu, 12.05.2006
+% Last modified by fjsimons-at-alum.mit.edu, 04/25/2010
 
 defval('Te','demo')
 
@@ -94,10 +94,8 @@ if ~isstr(Te) & ~strcmp(Te,'demo')
 
   l=lbd;
   
-  varnames={'G2b','k','l','Zb','Zf'};
-  for ind=1:nargout
-    varargout{ind}=eval(varnames{ind});
-  end
+  varns={G2b,k,l,Zb,Zf};
+  varargout=varns(1:nargout);
 else
   % Illustrates the functions FORSYTH, MCKENZIE, and TRANSL
   clf
