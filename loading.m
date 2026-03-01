@@ -25,8 +25,8 @@ function [Hs,Gb,Zbav,C2bav,k,Zb,C2b,f,fK]=loading(R,T,Te,AT,kx,ky,F,method)
 %
 % Hs         final topography in km
 % Gb         Bouguer anomaly in mgal
-% Zb         Bouguer admittance in mgal/m
-% C2b        Bouguer coherence square function
+% Zbav       Bouguer admittance in mgal/m (radially averaged)
+% C2bav      Bouguer coherence square function (radially averaged)
 %
 % See MCKENZIE, LOADING1, KNUM2
 %
