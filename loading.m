@@ -92,7 +92,8 @@ for index=2:length(DR)
   inds=inds(inds~=index);
   jnds=1:length(DR);
   jnds=jnds(jnds~=index);
-  Z(:,:,index)=TpG*(sum(DRekz(:,:,inds),3)-ekz(:,:,index).*(DK4g+sum(DR(jnds))));
+  Z(:,:,index)=TpG*(sum(DRekz(:,:,inds),3)-ekz(:,:,index).*...
+		    (DK4g+sum(DR(jnds))));
 end
 
 % Convert to mgal/m
