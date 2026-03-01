@@ -20,7 +20,7 @@ function [k12,l12]=transl(f,Te,r,dr,E,v,g)
 % k12       Wavenumber at which C2=0.5, in rad/km
 % l12       Wavelength at which C2=0.5, in km
 %
-% Last modified by fjsimons-at-alum.mit.edu, October 21st, 2003
+% Last modified by fjsimons-at-alum.mit.edu, 04/06/2010
 
 defval('f',0.5)
 defval('Te',17)
@@ -61,12 +61,12 @@ beta=(FF.^2.*dr.^2+4.*FF.^2.*dr.*r-2.*FF.^3.*dr.*r+...
 % And note the typo, this should be corrected to
 k=(1/2*g./DD./FF.*(-FF.*dr-FF.*r+FF.^2.*r+dr+beta.^(1/2))).^(1./4);
 % Check the results
-difer(k-k12)
+difer(k-k12,[],[],NaN)
 
 % Also check by plugging it in
 difer(((1+DD.*k.^4/dr/g)*dr^2+FF.^2*r^2.*(1+DD.*k.^4/r/g)).^2./...
        ((1+DD.*k.^4/dr/g).^2*dr^2+FF.^2*r^2)./...
-        (dr^2+FF.^2*r^2.*(1+DD.*k.^4/r/g).^2)-1/2)
+        (dr^2+FF.^2*r^2.*(1+DD.*k.^4/r/g).^2)-1/2,[],[],NaN)
 
 % Back into the right units
 k12=k12*1000;
