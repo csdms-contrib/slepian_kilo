@@ -106,7 +106,6 @@ if nargout>=2
     invDT=[fax.*(               2*phi) ...
 	   fax.*(  dpos(DEL,-1,1)*pxp) ...
 	   fax.*(2*dpos(DEL,-2,2)*xi )];
-    % Eq. (A9)
     dDTinvdf2=-invDT/2/f2;
     % The total one
     % Eq. (A21)

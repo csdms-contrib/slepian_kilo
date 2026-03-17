@@ -1,5 +1,5 @@
-function mcF=Fisherkros(k,th,params,xver)
-% mcF=Fisherkros(k,th,params,xver)
+function mcF=fisherkros(k,th,params,xver)
+% mcF=fisherkros(k,th,params,xver)
 %
 % Calculates the entries in the Fisher matrix for Olhede & Simons (2013)
 % for the CORRELATED initial-loading model prior to wavenumber averaging. 
@@ -32,7 +32,7 @@ function mcF=Fisherkros(k,th,params,xver)
 % EXAMPLE:
 % 
 % [~,~,th0,p,k]=simulros([],[],[],1);
-% mcF=Fisherkros(k,th0,p,1);
+% mcF=fisherkros(k,th0,p,1);
 %
 % Last modified by fjsimons-at-alum.mit.edu, 01/08/2013
 
