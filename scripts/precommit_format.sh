@@ -1,6 +1,4 @@
 #!/bin/bash
-
-# Get staged MATLAB files, exclude externals/
 FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.m$' | grep -v '^externals/')
 
 if [ -z "$FILES" ]; then
@@ -10,12 +8,17 @@ fi
 
 echo "Running MBeautifier on staged MATLAB files..."
 
-# Build MATLAB cell array of files
-MATLAB_FILES=$(printf "'%s'," $FILES)
+# Convert relative paths to absolute paths
+ABS_FILES=()
+for f in $FILES; do
+    ABS_FILES+=("$(pwd)/$f")
+done
 
-# Run MATLAB in batch mode
-matlab -batch "addpath('externals/MBeautifier'); files={${MATLAB_FILES}}; scripts.format_staged(files);"
+# Build MATLAB cell array
+MATLAB_FILES=$(printf "'%s'," "${ABS_FILES[@]}")
 
-# Re-add formatted files
-git add $FILES
+# Run MATLAB batch
+matlab -batch "addpath('externals/MBeautifier'); scripts.format_staged({${MATLAB_FILES}});"
 
+# Re-add files
+git add "${FILES[@]}"
