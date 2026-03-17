@@ -1,8 +1,8 @@
 repos:
   - repo: local
     hooks:
-      - id: matlab-format
-        name: MATLAB Format
+      - id: matlab-mbeautifier
+        name: MATLAB MBeautifier Pre-Commit
         entry: bash scripts/precommit_format.sh
         language: system
         pass_filenames: false
