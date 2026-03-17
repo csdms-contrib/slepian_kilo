@@ -3,11 +3,9 @@ function setup()
     addpath(genpath('src'));
 
     % Add external dependencies (if present)
-    if isfolder('externals')
-        addpath(genpath('externals'));
-    end
+    addpath(genpath('externals'));
 
-    % Check for required toolbox
+    % Check for required toolboxes
     assert(license('test', 'Optimization_Toolbox') == 1, ...
         'Optimization Toolbox is required.');
 end
