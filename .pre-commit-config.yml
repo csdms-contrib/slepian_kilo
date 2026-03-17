@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: matlab-format
+        name: MATLAB Format
+        entry: bash scripts/precommit_format.sh
+        language: system
+        pass_filenames: false
