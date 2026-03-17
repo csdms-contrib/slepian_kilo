@@ -1,0 +1,27 @@
+[submodule "external/slepian_alpha"]
+	path = external/slepian_alpha
+	url = https://github.com/csdms-contrib/slepian_alpha
+[submodule "external/slepian_bravo"]
+	path = external/slepian_bravo
+	url = https://github.com/csdms-contrib/slepian_bravo
+[submodule "external/slepian_charlie"]
+	path = external/slepian_charlie
+	url = https://github.com/csdms-contrib/slepian_charlie
+[submodule "external/slepian_delta"]
+	path = external/slepian_delta
+	url = https://github.com/csdms-contrib/slepian_delta
+[submodule "external/slepian_echo"]
+	path = external/slepian_echo
+	url = https://github.com/csdms-contrib/slepian_echo
+[submodule "external/slepian_foxtrot"]
+	path = external/slepian_foxtrot
+	url = https://github.com/csdms-contrib/slepian_foxtrot
+[submodule "external/slepian_golf"]
+	path = external/slepian_golf
+	url = https://github.com/csdms-contrib/slepian_golf
+[submodule "external/slepian_hotel"]
+	path = external/slepian_hotel
+	url = https://github.com/csdms-contrib/slepian_hotel
+[submodule "external/slepian_juliet"]
+	path = external/slepian_juliet
+	url = https://github.com/csdms-contrib/slepian_juliet
