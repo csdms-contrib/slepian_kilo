@@ -52,3 +52,6 @@
 [submodule "externals/slepian_juliet"]
 	path = externals/slepian_juliet
 	url = https://github.com/csdms-contrib/slepian_alpha
+[submodule "externals/MBeautifier"]
+	path = externals/MBeautifier
+	url = https://github.com/davidvarga/MBeautifier
