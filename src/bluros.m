@@ -61,7 +61,7 @@ if ~isstr(S)
 
   if isfield(params,'taper')
       if ~[all(params.taper) ==1]
-          if length(params.taper)>1 || iscell(params.taper)
+          if length(params.taper) >1 || iscell(params.taper)
               error('Build in the taper properly')
           end
       end
