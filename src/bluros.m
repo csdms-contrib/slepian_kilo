@@ -1,4 +1,4 @@
-function varargout=bluros(S,params,xver)
+  function varargout=bluros(S,params,xver)
 % [Sbar,k,c2,Fejk]=BLUROS(S,params,xver)
 %
 % Blurring of a spectral matrix with the periodogram of a spatial windowing
