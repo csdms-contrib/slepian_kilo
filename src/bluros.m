@@ -58,12 +58,11 @@ if ~isstr(S)
   if params.blurs<0 | isinf(params.blurs)
     error('You should be calling BLUROSY, not BLUROS!')
   end
-
-  if isfield(params,'taper')
-      if ~ [all(params.taper) == 1]
+ if isfield(params,'taper')
+ if ~ [all(params.taper) == 1]
           if length(params.taper) >1 || iscell(params.taper)
               error('Build in the taper properly')
-          end
+ end
       end
   end
   % Set defaults
