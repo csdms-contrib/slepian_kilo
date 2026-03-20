@@ -267,3 +267,4 @@ cbs=colorbar('ver');
 axes(cbs)
 xcb=ylabel(sprintf(strink,unid));
 set(cbs,'ylim',limc)
+

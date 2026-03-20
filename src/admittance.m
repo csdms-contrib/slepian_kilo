@@ -29,6 +29,7 @@ function varargout=admittance(Te,f2,r,zm,D1,D2,g,k,pltit)
 % FORSYTH, MCKENZIE, ESS6
 %
 % Last modified by fjsimons-at-alum.mit.edu, 03/06/2012
+% Last modified by erinoneil@princeton.edu, 03/19/2026
 
 % Define default values first, all in SI units
 defval('Te',40*1e3);
@@ -101,14 +102,14 @@ if pltit==1
 	([pos(index,1) pos(index,2)],ah,num2str(f2(index)),10,[],0.8);
   end
   [bh(index+1),th(index+1)]=boxtex([0.003 0.0098],ah,'f^2',10,[],0.8);
-  set(th,'horizontala','center','FontS',12)
+  set(th,'horizontala','center','FontSize',12)
   figdisp([],1)
   longticks(ah)
   ax=xtraxis1d(ah);
   xl(2)=xlabel('wavelength (km)');
   longticks(ax,2)
-  set([ah gca xl yl],'FontS',12)
-  set([xl yl],'FontS',15)
+  set([ah gca xl yl],'FontSize',12)
+  set([xl yl],'FontSize',15)
 else
   [ah,xl,yl]=deal(NaN);
 end
