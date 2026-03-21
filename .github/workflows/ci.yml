@@ -1,0 +1,32 @@
+name: MATLAB CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v2
+
+      - name: Run setup
+        uses: matlab-actions/run-command@v2
+        with:
+          command: setup
+
+      - name: Run tests (or basic check)
+        uses: matlab-actions/run-command@v2
+        with:
+          command: |
+            disp("Running basic check...");
+            setup;

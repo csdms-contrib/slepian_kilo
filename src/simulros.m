@@ -204,8 +204,8 @@ elseif strcmp(th0,'demo1')
 	 'xlim',thex([1 end])+[-1 1]/2,...
 	 'ytick',they,...
 	 'xtick',thex,...
-	 'ytickl',-spunkm(1)/2+(they-1)*dydx(1)/1000,...
-	 'xtickl',-spunkm(2)/2+(thex-1)*dydx(2)/1000)
+	 'YTickLabel',-spunkm(1)/2+(they-1)*dydx(1)/1000,...
+	 'XTickLabel',-spunkm(2)/2+(thex-1)*dydx(2)/1000)
   longticks([ah cb])
   nolabels(ah(1:2),1)
   nolabels(ha(3:4),2)
@@ -215,14 +215,14 @@ elseif strcmp(th0,'demo1')
   axis([-1 1 -1 1])
   nolabels(ah(4)); noticks(ah(4)); box on; axis image
   
-  xof=-0.75;
+  xof=0.25;
   tx(1)=text(xof, 0.75,sprintf('%s = %12.3g','D',       th0(1)));
-  tx(2)=text(xof, 0.50,sprintf('%s = %12.3g','f^2',     th0(2)));
-  tx(5)=text(xof, 0.25,sprintf('%s = %12.3g','r',       th0(3)));
+  tx(2)=text(xof, 0.65,sprintf('%s = %12.3g','f^2',     th0(2)));
+  tx(5)=text(xof, 0.55,sprintf('%s = %12.3g','r',       th0(3)));
 
-  tx(3)=text(xof, 0.00,sprintf('%s = %12.3g','\sigma^2',th0(end-2)));
-  tx(4)=text(xof,-0.25,sprintf('%s = %12.3g','\nu',     th0(end-1)));
-  tx(5)=text(xof,-0.50,sprintf('%s = %12.3g','\rho',    th0(end)));
+  tx(3)=text(xof, 0.45,sprintf('%s = %12.3g','\sigma^2',th0(end-2)));
+  tx(4)=text(xof,0.35,sprintf('%s = %12.3g','\nu',     th0(end-1)));
+  tx(5)=text(xof,0.25,sprintf('%s = %12.3g','\rho',    th0(end)));
   moveh(ah(4),-getpos(cb(2),3))
 
   fig2print(gcf,'portrait')
@@ -245,6 +245,7 @@ elseif strcmp(th0,'demo3')
   Lk=Lkros(k,th0,params,Hk); 
   imagesc(decibel(v2s(Lk)))
   axis image
+
 end
 
 % Plotting routine %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -253,17 +254,25 @@ axes(aha)
 imagesc(reshape(dats,nm)); 
 axis image
 limc=halverange(dats,95,NaN);
+
 % Later, be more sophisticated than this
-if limc(1)>-1
-  limc=round(100*limc)/100;
-else
-  limc=round(limc);
-end
+
+%% EO (start): This made limc = [0, 0], I had to comment it out
+% if limc(1)>-1
+%   limc=round(100*limc)/100;
+% else
+%   limc=round(limc);
+% end
+%% EO (end)
+
 set(aha,'clim',limc)
+
 tls=title(stronk);
 xa=xlabel(sprintf('mean %+6.3f ; stdev %6.3f %s',...
 		  mean(dats(:)),std(dats(:)),unid));
 cbs=colorbar('ver');
-axes(cbs)
-xcb=ylabel(sprintf(strink,unid));
+
+xcb=ylabel(cbs, sprintf(strink,unid));
+
 set(cbs,'ylim',limc)
+

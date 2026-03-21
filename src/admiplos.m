@@ -20,7 +20,7 @@ function varargout=admiplos(thhats,th0,truecov,E,v,params,ah,numsim)
 % E               Young's modulus (not used for single fields)
 % v               Poisson's ratio (not used for single fields)
 % params     A parameter vector with constants assumed known, see SIMULOS
-%            In order of apppearance and as needed only
+%            In order of appearance and as needed only
 %            DEL   surface and subsurface density contrast [kg/m^3]
 %            g     gravitational acceleration [m/s^2]
 %            z2    the positive depth to the second interface [m]

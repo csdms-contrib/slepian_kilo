@@ -6,7 +6,7 @@ function dprod=dpos(DEL,varargin)
 %
 % INPUT:
 %
-% DEL        A 1xN vector (in casu, of two density contrasts)
+% DEL        A 1xN vector (in case of two density contrasts)
 % POW1       The first power
 % POW2       The second power, ..., until POWN     
 %

@@ -1,0 +1,54 @@
+[submodule "external/slepian_alpha"]
+	path = external/slepian_alpha
+	url = https://github.com/csdms-contrib/slepian_alpha
+[submodule "external/slepian_bravo"]
+	path = external/slepian_bravo
+	url = https://github.com/csdms-contrib/slepian_bravo
+[submodule "external/slepian_charlie"]
+	path = external/slepian_charlie
+	url = https://github.com/csdms-contrib/slepian_charlie
+[submodule "external/slepian_delta"]
+	path = external/slepian_delta
+	url = https://github.com/csdms-contrib/slepian_delta
+[submodule "external/slepian_echo"]
+	path = external/slepian_echo
+	url = https://github.com/csdms-contrib/slepian_echo
+[submodule "external/slepian_foxtrot"]
+	path = external/slepian_foxtrot
+	url = https://github.com/csdms-contrib/slepian_foxtrot
+[submodule "external/slepian_golf"]
+	path = external/slepian_golf
+	url = https://github.com/csdms-contrib/slepian_golf
+[submodule "external/slepian_hotel"]
+	path = external/slepian_hotel
+	url = https://github.com/csdms-contrib/slepian_hotel
+[submodule "external/slepian_juliet"]
+	path = external/slepian_juliet
+	url = https://github.com/csdms-contrib/slepian_juliet
+[submodule "externals/slepian_alpha"]
+	path = externals/slepian_alpha
+	url = https://github.com/csdms-contrib/slepian_alpha
+[submodule "externals/slepian_bravo"]
+	path = externals/slepian_bravo
+	url = https://github.com/csdms-contrib/slepian_alpha
+[submodule "externals/slepian_charlie"]
+	path = externals/slepian_charlie
+	url = https://github.com/csdms-contrib/slepian_alpha
+[submodule "externals/slepian_delta"]
+	path = externals/slepian_delta
+	url = https://github.com/csdms-contrib/slepian_alpha
+[submodule "externals/slepian_echo"]
+	path = externals/slepian_echo
+	url = https://github.com/csdms-contrib/slepian_alpha
+[submodule "externals/slepian_foxtrot"]
+	path = externals/slepian_foxtrot
+	url = https://github.com/csdms-contrib/slepian_alpha
+[submodule "externals/slepian_golf"]
+	path = externals/slepian_golf
+	url = https://github.com/csdms-contrib/slepian_alpha
+[submodule "externals/slepian_hotel"]
+	path = externals/slepian_hotel
+	url = https://github.com/csdms-contrib/slepian_alpha
+[submodule "externals/slepian_juliet"]
+	path = externals/slepian_juliet
+	url = https://github.com/csdms-contrib/slepian_alpha

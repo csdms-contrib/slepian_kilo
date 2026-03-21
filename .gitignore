@@ -1,0 +1,6 @@
+% Ignore the following extensions
+*.asv
+*.json
+*.png
+*.pdf
+*.DS_Store
