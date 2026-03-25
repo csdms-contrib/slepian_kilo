@@ -21,7 +21,7 @@ function olhedesimons1r(th,params)
 %          blurs 0 Don't blur likelihood (N=1 has the same effect)
 %                N Blur likelihood using the [default: N=2] resampled Fejer window
 % 
-% Last modified by fjsimons-at-alum.mit.edu, 04/03/2014
+% Last modified by fjsimons-at-alum.mit.edu, 03/25/2026
 
 % Propagate the BLUROS change but need refresher on the DIFER statements.
 
@@ -281,7 +281,7 @@ tx(2)=text(x(1),2*ylow-0,sprintf('%s = %g','\sigma^2',s2));
 tx(3)=text(x(1),2*ylow-3,sprintf('%s = %g','\nu',nu));
 tx(4)=text(x(1),2*ylow-6,sprintf('%s = %g','\rho',rho));
 
-set([ah([1 2 7 8 6]) xax tx ylx pl ql rl sl tl xlx ylx],'FontS',8)
+set([ah([1 2 7 8 6]) xax tx ylx pl ql rl sl tl xlx ylx],'FontSize',8)
 
 axes(ah(1))
 h(1)=text('string','$\mathcal{H}_{1}$',...
