@@ -54,7 +54,9 @@ function varargout=simulros(th0,params,xver)
 %
 % MLEROS, LOADING, SIMULOS
 %
-% Last modified by fjsimons-at-alum.mit.edu, 07/14/2015
+% Last run on MATLAB Version: 9.7.0.1190202 (R2019b)
+%
+% Last modified by fjsimons-at-alum.mit.edu, 03/25/2026
 
 % Check how it behaves when NOT a power of two! FFT should still be exact
 % so wouldn't matter. Implement the windowing!
@@ -183,9 +185,9 @@ elseif strcmp(th0,'demo1')
   clf
   kelicol
   [ah,ha]=krijetem(subnum(2,2));
-  [tl(1),cb(1),xc(1),xa(1)]=plotit(ah(1),Hx(:,1)/1000,size(k),...
+  [tl(1),cb(1),xc(1),xa(1)]=plotit(ah(1),Hx(:,1),size(k),...
 		       'final surface','topography (%s)','km');
-  [tl(2),cb(2),xc(2),xa(2)]=plotit(ah(2),Hx(:,2)/1000,size(k),sprintf(...
+  [tl(2),cb(2),xc(2),xa(2)]=plotit(ah(2),Hx(:,2),size(k),sprintf(...
       'final subsurface z_2 = %i km',round(z2/1000)),'topography (%s)','km');
   [tl(3),cb(3),xc(3),xa(3)]=plotit(ah(3),Gx*1e5,size(k),sprintf(...
       'gravity anomaly with %s%s = %i kg m^{-3}',...
@@ -204,8 +206,8 @@ elseif strcmp(th0,'demo1')
 	 'xlim',thex([1 end])+[-1 1]/2,...
 	 'ytick',they,...
 	 'xtick',thex,...
-	 'ytickl',-spunkm(1)/2+(they-1)*dydx(1)/1000,...
-	 'xtickl',-spunkm(2)/2+(thex-1)*dydx(2)/1000)
+	 'YTickLabel',-spunkm(1)/2+(they-1)*dydx(1)/1000,...
+	 'XTickLabel',-spunkm(2)/2+(thex-1)*dydx(2)/1000)
   longticks([ah cb])
   nolabels(ah(1:2),1)
   nolabels(ha(3:4),2)
@@ -253,17 +255,10 @@ axes(aha)
 imagesc(reshape(dats,nm)); 
 axis image
 limc=halverange(dats,95,NaN);
-% Later, be more sophisticated than this
-if limc(1)>-1
-  limc=round(100*limc)/100;
-else
-  limc=round(limc);
-end
 set(aha,'clim',limc)
 tls=title(stronk);
 xa=xlabel(sprintf('mean %+6.3f ; stdev %6.3f %s',...
 		  mean(dats(:)),std(dats(:)),unid));
 cbs=colorbar('ver');
-axes(cbs)
 xcb=ylabel(sprintf(strink,unid));
 set(cbs,'ylim',limc)
