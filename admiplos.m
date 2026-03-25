@@ -39,7 +39,7 @@ function varargout=admiplos(thhats,th0,truecov,E,v,params,ah,numsim)
 %
 % MLEOS, MLEPLOS, ADMITTANCE, FORSYTH
 %
-% Last modified by fjsimons-at-alum.mit.edu, 07/08/2013
+% Last modified by fjsimons-at-alum.mit.edu, 03/25/2026
 
 % Default values
 defval('thhats',[])
@@ -328,7 +328,7 @@ bottom(cm,ah(2))
 bottom(cs,ah(2))
 
 % Do this so the reduction looks slightly better
-set(yl,'FontS',12)
+set(yl,'FontSize',12)
 
 % Final cosmetics
 shrink(ah,1,2)
