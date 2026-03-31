@@ -376,6 +376,7 @@ S5 = maternosp(th, p, 1);
 diferm(S4, S5, -2)
 
 % Make the plots for visual inspection!
+
 figure(1)
 clf
 [ah, ha, H] = krijetem(subnum(2, 3));

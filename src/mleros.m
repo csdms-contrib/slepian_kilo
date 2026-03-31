@@ -172,7 +172,7 @@ if ~isstr(Hx)
     % itself, although with real data of course we don't have this.
   end
   
-  NN=200;
+  NN=3;
   % And now get going with the likelihood using Hk(:,1:2) or [Hk(:,1) Gk]
   % [ off|iter|iter-detailed|notify|notify-detailed|final|final-detailed ] 
   % Should probably make the tolerances relative to the number of k points
@@ -266,9 +266,9 @@ elseif strcmp(Hx,'demo1')
 
   % The number of parameters to solve for
   np=6;
-    
+  
   % Open files and return format strings
-  [fids,fmts,fmtf,fmte,fmtd,fmtc]=osopen(np);
+  [fids,fmts,fmti]=osopen(np);
  
   % Do it!
   good=0; 
@@ -522,10 +522,10 @@ elseif strcmp(Hx,'demo6')
     thini2=[thini1(1) thini1(2) 0 thini1(3:5)];
     
     % No correlation!
-    [Hx,Gx,th0,p,k,Hk]=simulros0(th0,params,xver);
+    [Hx,Gx,th0,p,k,Hk]=simulros(th0,params,xver);
     
     % No correlation!
-    [thhat1,~,logli1,thinisc1,scl1,p1,e1,o1,gr1,hs1]=mleros0(Hx,Gx,thini1,p,'con');
+    [thhat1,~,logli1,thinisc1,scl1,p1,e1,o1,gr1,hs1]=mleros(Hx,Gx,thini1,p,'con');
     % Possible correlation!
     [thhat2,~,logli2,thinisc2,scl2,p2,e2,o2,gr2,hs2]=mleros(Hx,Gx,thini2,p,'con');
 
@@ -682,7 +682,7 @@ elseif  strcmp(Hx,'demo7')
     thini2=[thini1(1) thini1(2) 0 thini1(3:5)];
     
     % No correlation in the simulation
-    [Hx,Gx,th0,p,k,Hk]=simulros0(th0,params,xver);
+    [Hx,Gx,th0,p,k,Hk]=simulros(th0,params,xver);
     
     % Save this junk so inside I can take a look at it
     save keepfornow Hx Gx th0 p k  Hk
@@ -692,7 +692,7 @@ elseif  strcmp(Hx,'demo7')
     disp(sprintf('Trying compensation depth z2 = %i',round(z2(index))))
         
     % No correlation in the inversion!
-    [thhat1,~,logli1,thinisc1,scl1,p1,e1,o1,gr1,hs1,Hk1]=mleros0(Hx,Gx,thini1,p,'con',-1);
+    [thhat1,~,logli1,thinisc1,scl1,p1,e1,o1,gr1,hs1,Hk1]=mleros(Hx,Gx,thini1,p,'con',-1);
 
     %pause
     
