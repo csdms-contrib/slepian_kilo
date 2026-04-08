@@ -70,7 +70,7 @@ function varargout=mleros(Hx,Gx,thini,params,algo,bounds,aguess)
 
 % NOTE: There are demonstrably bad solutions when r is close to 0 and f
 % is close to -1 and 1. Fix in bounding? Ignore, fix later? Also, keep
-% the D from being unrealistically low. If rho is zero poops out.
+% the D from being unrealistically low. If rho is zero pops out.
 
 if ~isstr(Hx)
   defval('algo','con')
@@ -263,9 +263,6 @@ elseif strcmp(Hx,'demo1')
   th0=thini; clear thini
   % What fixed-parameter set? The FOURTH argument after the demo id
   defval('params',[]);
-
-  % The number of parameters to solve for
-  np=6;
   
   % Open files and return format strings
   [fids,fmts,fmti]=osopen(np);
@@ -369,9 +366,6 @@ elseif strcmp(Hx,'demo2')
   datum=Gx;
   defval('datum',date)
 
-  % The number of parameters to solve for
-  np=6;
-
   % Load everything you know about this simulation
   [th0,thhats,params,truecov,E,v,~,~,momx]=osload(datum);
 
@@ -409,9 +403,6 @@ elseif strcmp(Hx,'demo4')
   defval('Gx',[]);
   datum=Gx;
   defval('datum',date)
-  
-  % The number of parameters to solve for
-  np=6;
 
   % Load everything you know about this simulation
   [th0,thhats,params,truecov,E,v,obscov,sclcov]=osload(datum);
@@ -495,8 +486,6 @@ elseif strcmp(Hx,'demo5')
 
   % Time to rerun LOGLIROS one last time at the solution
   [L,~,momx]=logliros(thhat,p,Hk,k,scl);
-
-keyboard
 
   % Better feed this to the next code, now it's redone inside
   mlechiplos(2,Hk,thhat,scl,p,ah,0,th0,covth,E,v);
@@ -600,7 +589,7 @@ elseif strcmp(Hx,'demo6')
   % The below is more or less copied from MLECHIPLOS, should maybe spin off
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   axes(ah(1))
-  [bdens,c]=hist(X,5*round(log(length(X))));
+  [bdens,c]=histogram(X,5*round(log(length(X))));
   bdens=bdens/indeks(diff(c),1)/length(X);
   bb=bar(c,bdens,1);
   set(bb,'FaceC',grey)
@@ -616,7 +605,7 @@ elseif strcmp(Hx,'demo6')
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   axes(ah(2))
   % Note that SOME people use a different parameterization (b vs 1/b)
-  h=qqplot(X,ProbDistUnivParam('gamma',[df/2 2])); 
+  h=qqplot(X,makedist('Gamma', 'a', df/2, 'b', 2)); 
   axis square; box on
   set(h(1),'MarkerE','k')  
   set(h(3),'LineS','-','Color',grey)
@@ -666,7 +655,6 @@ elseif  strcmp(Hx,'demo7')
   
   % No correlation!
   th0=[1e24 0.8 0.0025 2 2e4];
-  nperturb=0.25;
   nperturb=0.025
 
   N=51;
@@ -755,8 +743,6 @@ elseif  strcmp(Hx,'demo7')
   logliesrt=[z2(:) logliesrt];
 
   disp('This demo is NOT ready for no-interactive mode!')
-
-  keyboard
 
   % Quick save to not lose it
   save logliesrt logliesrt params xver th0 Hx Gx p k Hk scl1 scl2
