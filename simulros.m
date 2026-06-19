@@ -56,7 +56,7 @@ function varargout=simulros(th0,params,xver)
 %
 % Last run on MATLAB Version: 9.7.0.1190202 (R2019b)
 %
-% Last modified by fjsimons-at-alum.mit.edu, 03/25/2026
+% Last modified by fjsimons-at-alum.mit.edu, 06/18/2026
 
 % Check how it behaves when NOT a power of two! FFT should still be exact
 % so wouldn't matter. Implement the windowing!
@@ -127,9 +127,7 @@ if ~isstr(th0)
     % Which we multiply by the spectral-spectral portion
     S=[S11.*T(:,1) S11.*T(:,2) S11.*T(:,3)];
     
-    % Make the gravity BEFORE blurring says SCO
-    % FJS to change
-    disp('watch')
+    % FJS should make the gravity BEFORE blurring says SCO
     % SG2=[2*pi*G*DEL(2)*exp(-k(:).*z2)]   .*S(:,2);
     % SG3=[2*pi*G*DEL(2)*exp(-k(:).*z2)].^2.*S(:,3);
     
