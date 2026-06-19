@@ -107,8 +107,8 @@ if pltit==1
   ax=xtraxis1d(ah);
   xl(2)=xlabel('wavelength (km)');
   longticks(ax,2)
-  set([ah gca xl yl],'FontS',12)
-  set([xl yl],'FontS',15)
+  set([ah gca xl yl],'FontSize',12)
+  set([xl yl],'FontSize',15)
 else
   [ah,xl,yl]=deal(NaN);
 end
