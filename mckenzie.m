@@ -21,9 +21,9 @@ function [l,Zb,G2b,Zf,G2f]=mckenzie(R,T,F,Te)
 %
 % l       wavelength in m
 % Zb      Bouguer admittance in mgal/m
-% G2b     Bouguer coherence-square
+% G2b     Bouguer coherence-squared
 % Zf      Free-air admittance in mgal/m
-% G2f     Free-air coherence-square
+% G2f     Free-air coherence-squared
 %
 % EXAMPLE: Forsyth's Fig. 1
 %
@@ -33,7 +33,7 @@ function [l,Zb,G2b,Zf,G2f]=mckenzie(R,T,F,Te)
 %
 % See FORSYTH, MCKENZIE1, MCKENZIE2, LOADING
 %
-% Last modified by fjsimons-at-alum.mit.edu, October 21st, 2003
+% Last modified by fjsimons-at-alum.mit.edu, 06/19/2026
 
 defval('R',[1030 2600 2900 3300])
 defval('T',[      0     15   35])
@@ -86,7 +86,7 @@ end
 % Calculate Bouguer admittance
 Zb=((F(:)'.^2)*(Y.^2.*Z))./((F(:)'.^2)*(Y.^2));
 
-% Calculate Bouguer coherence-square
+% Calculate Bouguer coherence-squared
 G2b=(([F(:)'].^2)*(Y.^2.*Z)).*(([F(:)'].^2)*(Y.^2.*Z))./...
    (([F(:)'].^2)*(Y.^2))./(([F(:)'].^2)*(Y.^2.*Z.^2));
 
@@ -94,6 +94,6 @@ G2b=(([F(:)'].^2)*(Y.^2.*Z)).*(([F(:)'].^2)*(Y.^2.*Z))./...
 Z=Z+repmat(TpG*DR(1),size(Z))/1e-5;
 Zf=((F(:)'.^2)*(Y.^2.*Z))./((F(:)'.^2)*(Y.^2));
 
-% Calculate Free-air coherence-square
+% Calculate Free-air coherence-squared
 G2f=(([F(:)'].^2)*(Y.^2.*Z)).*(([F(:)'].^2)*(Y.^2.*Z))./...
    (([F(:)'].^2)*(Y.^2))./(([F(:)'].^2)*(Y.^2.*Z.^2));
