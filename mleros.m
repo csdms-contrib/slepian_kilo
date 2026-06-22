@@ -1,5 +1,5 @@
 function varargout=mleros(Hx,Gx,thini,params,algo,bounds,aguess)
-% [thhat,logli,thini,scl,params,eflag,oput,grd,hes,Hk,k,opions,bounds]=...
+% [thhat,covh,logli,thini,scl,params,eflag,oput,grd,hes,Hk,k,opions,bounds]=...
 %          MLEROS(Hx,Gx,thini,params,algo,bounds,aguess)
 %
 % Performs a maximum-likelihood estimation for CORRELATED loads as in
@@ -32,7 +32,7 @@ function varargout=mleros(Hx,Gx,thini,params,algo,bounds,aguess)
 %
 % thhat    The maximum-likelihood estimate of the vector [scaled]:
 %          [D f2 r s2 nu rho], in Nm, and "nothing", see SIMULROS
-% covh     A covariance estimate of the parameters
+% covh     A Hessian-based covariance estimate of the parameters
 % logli    The maximized value of the likelihood
 % thini    The scaled starting guess used in the optimization
 % scl      The scaling applied as part of the optimization procedure
