@@ -269,7 +269,7 @@ elseif strcmp(Hx,'demo1')
   np=6;
     
   % Open files and return format strings
-  [fids,fmts,fmtf,fmte,fmtd,fmtc]=osopen(np);
+  [fids,fmts,fmti]=osopen(np);
  
   % Do it!
   good=0; 
