@@ -32,6 +32,7 @@ function varargout=mleros(Hx,Gx,thini,params,algo,bounds,aguess)
 %
 % thhat    The maximum-likelihood estimate of the vector [scaled]:
 %          [D f2 r s2 nu rho], in Nm, and "nothing", see SIMULROS
+% covh     A covariance estimate of the parameters
 % logli    The maximized value of the likelihood
 % thini    The scaled starting guess used in the optimization
 % scl      The scaling applied as part of the optimization procedure
@@ -73,7 +74,7 @@ function varargout=mleros(Hx,Gx,thini,params,algo,bounds,aguess)
 % the D from being unrealistically low. If rho is zero poops out.
 
 if ~isstr(Hx)
-  defval('algo','con')
+  defval('algo','unc')
   if strcmp(algo,'con')
     % Parameters for FMINCON in case that's what's being used
     bounds={[],[],... % Linear inequalities
@@ -197,40 +198,40 @@ if ~isstr(Hx)
 
   % And find the MLE! Work on scaled parameters
   try
-    switch algo
-     case 'unc'
-      % disp('Using FMINUNC for unconstrained optimization of LOGLIROS')
-      t0=clock;
-      [thhat,logli,eflag,oput,grd,hes]=...
-	  fminunc(@(theta) logliros(theta,params,Hk,k,scl),...
-		  thini,options);
-      ts=etime(clock,t0);
-      % Could here compare to our own estimates of grad and hes!
-     case 'con'
-      % New for FMINCON
-      options.Algorithm='active-set';
-      % disp('Using FMINCON for constrained optimization of LOGLIROS')
-      t0=clock;
-      [thhat,logli,eflag,oput,lmd,grd,hes]=...
-	  fmincon(@(theta) logliros(theta,params,Hk,k,scl),...
-		  thini,...
-      		  bounds{1},bounds{2},bounds{3},bounds{4},...
-                  bounds{5}./scl,bounds{6}./scl,bounds{7},...
-		  options);
-      ts=etime(clock,t0);
-     case 'klose'
-       % Simply a "closing" run to return the options
-       varargout=cellnan(nargout,1,1);
-       varargout{end-1}=options;
-       varargout{end}=bounds;
-       return
-    end
-    if xver==1
-      disp(sprintf('%8.3gs per %i iterations or %8.3gs per %i function counts',...
-		   ts/oput.iterations*100,100,ts/oput.funcCount*1000,1000))
-    else
-      disp(sprintf('\n'))
-    end
+      switch algo
+        case 'unc'
+          % disp('Using FMINUNC for unconstrained optimization of LOGLIROS')
+          t0=clock;
+          [thhat,logli,eflag,oput,grd,hes]=...
+	      fminunc(@(theta) logliros(theta,params,Hk,k,scl),...
+		      thini,options);
+          ts=etime(clock,t0);
+          % Could here compare to our own estimates of grad and hes!
+        case 'con'
+          % New for FMINCON
+          options.Algorithm='active-set';
+          % disp('Using FMINCON for constrained optimization of LOGLIROS')
+          t0=clock;
+          [thhat,logli,eflag,oput,lmd,grd,hes]=...
+	      fmincon(@(theta) logliros(theta,params,Hk,k,scl),...
+		      thini,...
+      		      bounds{1},bounds{2},bounds{3},bounds{4},...
+                      bounds{5}./scl,bounds{6}./scl,bounds{7},...
+		      options);
+          ts=etime(clock,t0);
+        case 'klose'
+          % Simply a "closing" run to return the options
+          varargout=cellnan(nargout,1,1);
+          varargout{end-1}=options;
+          varargout{end}=bounds;
+          return
+      end
+      if xver==1
+          disp(sprintf('%8.3gs per %i iterations or %8.3gs per %i function counts',...
+		       ts/oput.iterations*100,100,ts/oput.funcCount*1000,1000))
+      else
+          disp(sprintf('\n'))
+      end
   catch
     % If something went wrong, exit gracefully
     varargout=cellnan(nargout,1,1);
@@ -308,6 +309,7 @@ elseif strcmp(Hx,'demo1')
     % the data size as more precision will be needed to navigate things
     % with smaller variance! At any rate, you want this not too low.
     optmin=Inf;
+
     % Maybe just print it and decide later? No longer e>0 as a condition.
     % e in many times is 0 even though the solution was clearly found, in
     % other words, this condition IS a way of stopping with the solution
