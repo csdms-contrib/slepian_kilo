@@ -1,5 +1,5 @@
 function varargout=mleros(Hx,Gx,thini,params,algo,bounds,aguess)
-% [thhat,covh,logli,thini,scl,params,eflag,oput,grd,hes,Hk,k,opions,bounds]=...
+% [thhat,covh,lpars,scl,thini,params,Hk,k]=...
 %          MLEROS(Hx,Gx,thini,params,algo,bounds,aguess)
 %
 % Performs a maximum-likelihood estimation for CORRELATED loads as in
@@ -33,18 +33,21 @@ function varargout=mleros(Hx,Gx,thini,params,algo,bounds,aguess)
 % thhat    The maximum-likelihood estimate of the vector [scaled]:
 %          [D f2 r s2 nu rho], in Nm, and "nothing", see SIMULROS
 % covh     A Hessian-based covariance estimate of the parameters
-% logli    The maximized value of the likelihood
-% thini    The scaled starting guess used in the optimization
+% lpars    The logarithmic likelihood and its derivatives AT or NEAR the estimate
+%          lpars{1} the numerical logarithmic likelihood [FMINUNC/FMINCON]
+%          lpars{2} the numerical scaled gradient, or score [FMINUNC/FMINCON]
+%          lpars{3} the numerical scaled second derivative, or Hessian [FMINUNC/FMINCON]
+%          lpars{4} the exit flag of the FMINUNC/FMINCON procedure [bad if 0]
+%          lpars{5} the output structure of the FMINUNC/FMINCON procedure
+%          lpars{6} the options used by the FMINUNC/FMINCON procedure
+%          lpars{7} any bounds used by the  FMINUNC/FMINCON procedure
+%          lpars{8} the residual moment statistics used for model testing 
+%          lpars{9} the predicted variance of lpars{8}(3) under the null hypothesis
 % scl      The scaling applied as part of the optimization procedure
+% thini    The scaled starting guess used in the optimization
 % params   The known constants used inside, see above
-% eflag    The exit flag of the optimization procedure [bad if 0]
-% oput     The output structure of the optimization procedure
-% grd      The gradient of the misfit function at the estimate
-% hes      The Hessian of the misfit function at the estimate
 % Hk       The spectral-domain interface topographies after deconvolution 
 % k        The wavenumbers on which the estimate is actually based
-% options  The options used by the optimization procedure
-% bounds   The bounds used by the optimization procedure
 %
 % NOTE: 
 %
@@ -67,7 +70,7 @@ function varargout=mleros(Hx,Gx,thini,params,algo,bounds,aguess)
 % Attempting to find the density contrast and compensation level
 % mleros('demo7')
 %
-% Last modified by fjsimons-at-alum.mit.edu, 06/25/2015
+% Last modified by fjsimons-at-alum.mit.edu, 06/23/2026
 
 % NOTE: There are demonstrably bad solutions when r is close to 0 and f
 % is close to -1 and 1. Fix in bounding? Ignore, fix later? Also, keep
@@ -221,9 +224,11 @@ if ~isstr(Hx)
           ts=etime(clock,t0);
         case 'klose'
           % Simply a "closing" run to return the options
+          lpars{6}=options;
+          lpars{7}=bounds;
+          % Simply a "closing" run to return the options
           varargout=cellnan(nargout,1,1);
-          varargout{end-1}=options;
-          varargout{end}=bounds;
+          varargout{end}=lpars;
           return
       end
       if xver==1
@@ -247,8 +252,18 @@ if ~isstr(Hx)
   disp(sprintf(sprintf('%s : %s\n ',str0,repmat(str2,size(thhat))),...
 	       'Asymptotic stds',sqrt(diag(covh))))
 
+
+  % Likelihood attributes
+  lpars{1}=logli;
+  lpars{2}=grd;
+  lpars{3}=hes;
+  lpars{4}=eflag;
+  lpars{5}=oput;
+  lpars{6}=options;
+  lpars{7}=bounds;
+  
   % Generate output as needed
-  varns={thhat,covh,logli,thini,scl,params,eflag,oput,grd,hes,Hk,k,options,bounds};
+  varns={thhat,covh,lpars,scl,thini,params,Hk,k};
   varargout=varns(1:nargout);
 elseif strcmp(Hx,'demo1')
   % If you run this again on the same date, we'll just add to THINI and
@@ -284,15 +299,16 @@ elseif strcmp(Hx,'demo1')
     % Check the dimensions of space and spectrum are right
     difer(length(Hx)-length(k(:)),[],[],NaN)
 
-    % Form the maximum-likelihood estimate
+    % Form the maximum-likelihood estimate, pass on the params, use th0
+    % as the basis for the perturbed initial values. Remember hes is scaled.
     t0=clock;
-    [thhat,covh,logli,thini,scl,p,e,o,gr,hs,~,~,ops,bnds]=...
-	mleros(Hx,Gx,[],p,[],[],th0);
+    [thhat,covh,lpars,scl,thini,p]=mleros(Hx,Gx,[],p,[],[],th0);
     ts=etime(clock,t0);
 
-    % Initialize the THZRO file
-    if index==1
-      oswzerob(fids(1),th0,p,ops,bnds,fmts)
+    % Initialize the THZRO file... note that the bounds may change
+    % between simulations, and only one gets recorded here
+    if ~any(isnan(thhat)) && index==1 && labindex==1
+      oswzerob(fids(1),th0,p,lpars,fmts)
     end
 
     % If a model was found, keep the results, if not, they're all NaNs
