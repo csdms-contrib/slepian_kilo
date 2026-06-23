@@ -239,7 +239,7 @@ if ~isstr(Hx)
   end
   
   % This is the entire-plane estimate (hence the factor 2!)
-  covh=hes2cov(-hes,scl,length(k(~~k))*2);
+  covh=hes2cov(-hes,length(k(~~k))*2);
 
   % Talk!
   disp(sprintf(sprintf('\n%s : %s ',str0,repmat(str2,size(thhat))),...
