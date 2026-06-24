@@ -252,6 +252,10 @@ if ~isstr(Hx)
   disp(sprintf(sprintf('%s : %s\n ',str0,repmat(str2,size(thhat))),...
 	       'Asymptotic stds',sqrt(diag(covh))))
 
+  % Here we compute the moment parameters and recheck the likelihood
+  [L, ~,momx]=logliros(scl.*thhat,params,Hk,k,scl);
+  diferm(L,logli)
+  %logliros (as opposed to logliosl) doesn't have the ability to make vr
 
   % Likelihood attributes
   lpars{1}=logli;
@@ -261,7 +265,9 @@ if ~isstr(Hx)
   lpars{5}=oput;
   lpars{6}=options;
   lpars{7}=bounds;
-  
+  lpars{8}=momx;
+  %lpars{9}=vr;
+
   % Generate output as needed
   varns={thhat,covh,lpars,scl,thini,params,Hk,k};
   varargout=varns(1:nargout);
@@ -307,7 +313,7 @@ elseif strcmp(Hx,'demo1')
 
     % Initialize the THZRO file... note that the bounds may change
     % between simulations, and only one gets recorded here
-    if ~any(isnan(thhat)) && index==1 % && labindex==1
+    if ~any(isnan(thhat)) && index==1 && labindex==1
       oswzerob(fids(1),th0,p,lpars,fmts)
     end
 
@@ -334,23 +340,20 @@ elseif strcmp(Hx,'demo1')
     try % Because if there are NaNs or not estimate it won't work
       % Maybe I'm too restrictive in throwing these out? Maybe the
       % Hessian can be slightly imaginary and I could still find thhat
-      if isreal([logli gr(:)']) ...
+      if isreal([lpars{1} lpars{2}']) ...
 	    && all(thhat([1 2 4 5 6])>0) ...
 	    && all(~isnan(thhat)) ...
-	    && o.iterations > itmin ...
-	    && o.firstorderopt < optmin
+	    && lpars{5}.iterations > itmin ...
+	    && lpars{5}.firstorderopt < optmin
 	good=good+1;
 	% Build the average of the Hessians for printout later
-	avH=avH+hs;
+	avH=avH+lpars{3}; %MLEOSL has this (divided by) ./[scl(:)*scl(:)'];
 	% Reapply the scaling before writing it out
 	fprintf(fids(2),fmts{1},thhat.*scl);
 	fprintf(fids(3),fmts{1},thini.*scl);
-	% Here we compute and write out the moments of the Xk
-	[L,~,momx]=logliosl(thhat,p,Hk,k,scl);
 
 	% Print the optimization results and diagnostics to a file 
-	oswdiag(fids(4),fmt1,fmt3,logli,gr,hs,thhat,thini,scl,ts,e,o,....
-		var(Hx),momx,covh)
+        oswdiag(fids(4),fmts,lpars,thhat,thini,scl,ts,var(Hx),covh)
       end
     end
   end
@@ -360,9 +363,9 @@ elseif strcmp(Hx,'demo1')
   % Initialize if all you want is to close the file
   if N==0
     [Hx,Gx,th0,p,k]=simulros(th0,params); 
-    [~,~,~,~,~,~,~,~,~,~,~,~,ops,bnds]=mleros(Hx,Gx,[],[],'klose');
     good=1; avH=avH+1; 
-    oswzerob(fids(1),th0,p,ops,bnds,fmts)
+    [~,~,lpars]=mleros(Hx,Gx,[],[],'klose');
+    oswzerob(fids(1),th0,p,lpars,fmts)
   end
   
   if good>=1 
@@ -378,9 +381,12 @@ elseif strcmp(Hx,'demo1')
     % Of course when we don't have the truth we'll build the covariance
     % from the single estimate that we have just obtained. This
     % covariance would then be the only thing we'd have to save.
-    oswzeroe(fids(1),sclth0,avH,good,F,covF,fmti)
+    % if labindex==1
+        oswzeroe(fids(1),sclth0,avH,good,F,covF,fmti)
+    % end
   end
-  
+
+  % Put both of these also into the thzro file 
   fclose('all');
 elseif strcmp(Hx,'demo2')
   defval('Gx',[]);
@@ -513,8 +519,6 @@ elseif strcmp(Hx,'demo5')
 
   % Time to rerun LOGLIROS one last time at the solution
   [L,~,momx]=logliros(thhat,p,Hk,k,scl);
-
-keyboard
 
   % Better feed this to the next code, now it's redone inside
   mlechiplos(2,Hk,thhat,scl,p,ah,0,th0,covth,E,v);
@@ -773,8 +777,6 @@ elseif  strcmp(Hx,'demo7')
   logliesrt=[z2(:) logliesrt];
 
   disp('This demo is NOT ready for no-interactive mode!')
-
-  keyboard
 
   % Quick save to not lose it
   save logliesrt logliesrt params xver th0 Hx Gx p k Hk scl1 scl2
