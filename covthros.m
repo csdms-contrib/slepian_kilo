@@ -78,7 +78,7 @@ F(5,6)=mcF{21};
 
 % Returns the unscaled covariance matrix and the scaled Fisher matrix
 disp('I am assuming that your wavenumbers are the entire plane')
-[covF,F]=fish2cov(F,scl,length(k(~~k))*2);
+covF=fish2cov(F,scl,length(k(~~k))*2);
 
 % Output
 varns={covF,F};
