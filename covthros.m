@@ -23,10 +23,10 @@ function varargout=covthros(th,params,k,scl)
 %
 % OUTPUT:
 %
-% covF     The covariance matrix between the parameters
-% F        The SCALED Fisher matrix
+% covF     The full-form covariance matrix between the parameters
+% F        The SCALED full-form Fisher matrix
 %
-% Last modified by fjsimons-at-alum.mit.edu, 06/22/2015
+% Last modified by fjsimons-at-alum.mit.edu, 06/26/2026
 
 % Default scaling is none
 defval('scl',ones(size(th)))
@@ -39,42 +39,14 @@ mcF=Fisherkros(k,th,params);
 
 % Take the expectation and put the elements in the right place
 for ind=1:length(mcF)
-  mcF{ind}=nanmean(mcF{ind});
+  cF(ind)=nanmean(mcF{ind});
 end
 
-% The upper half of the full Fisher matrix
-% These will become the variances
-F(1,1)=mcF{1};
-F(2,2)=mcF{2};
-F(3,3)=mcF{3};
-F(4,4)=mcF{4};
-F(5,5)=mcF{5};
-F(6,6)=mcF{6};
+% The full-form matrix
+F=trilosi(cF);
 
-% These will be the covariances of D with others
-F(1,2)=mcF{7};
-F(1,3)=mcF{8};
-F(1,4)=mcF{9};
-F(1,5)=mcF{10};
-F(1,6)=mcF{11};
-
-% These will be the covariances of f2 with others
-F(2,3)=mcF{12};
-F(2,4)=mcF{13};
-F(2,5)=mcF{14};
-F(2,6)=mcF{15};
-
-% These will be the covariances of r with others
-F(3,4)=mcF{16};  
-F(3,5)=mcF{17};
-F(3,6)=mcF{18};  
-
-% These will be the covariances of s2 with others
-F(4,5)=mcF{19};
-F(4,6)=mcF{20};
-
-% These will be the covariances of nu with others
-F(5,6)=mcF{21};
+% We really should be writing FISHIROS
+% F=fishiros(...
 
 % Returns the unscaled covariance matrix and the scaled Fisher matrix
 disp('I am assuming that your wavenumbers are the entire plane')
