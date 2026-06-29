@@ -404,14 +404,14 @@ elseif strcmp(Hx,'demo2')
   np=6;
 
   % Load everything you know about this simulation
-  [th0,thhats,params,truecov,covavhs,~,E,v,~,~,momx,covXpix]=osload(datum);
+  [th0,thhats,params,truecov,covavhs,~,E,v,~,~,momx,covXpix,covF0]=osload(datum);
 
   % Report the findings of the moment parameters
   disp(sprintf('m(m(Xk)) %f m(v(Xk)) %f m(magic) %s v(magic) %f',...
 	      mean(momx),var(momx(:,end))))
 
   % Plot it all - perhaps some selection on optis?
-  [ah,ha]=mleplos(thhats,th0,truecov,covavhs,covXpix,E,v,params,sprintf('MLEROS-%s',datum));p
+  [ah,ha]=mleplos(thhats,th0,covF0,covavhs,covXpix,E,v,params,sprintf('MLEROS-%s',datum));p
 
   % Print the figure! Don't forget the degs.pl script
   figna=figdisp([],sprintf('%s_%s',Hx,datum),[],1);
