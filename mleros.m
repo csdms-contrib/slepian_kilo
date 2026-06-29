@@ -152,10 +152,8 @@ if ~isstr(Hx)
   k=knums(params);
   
   % Modify to demean
-  disp('NOT DEMEAN BOTH DATA SETS')
   Hx(:,1)=Hx(:,1)-mean(Hx(:,1));
   Gx=Gx-mean(Gx);
-  % Let us NOT demean and see where we end up...
 
   % Turn the observation vector to the spectral domain
   Hk(:,1)=tospec(Tx(:).*Hx(:,1),params);
@@ -273,7 +271,7 @@ if ~isstr(Hx)
   varargout=varns(1:nargout);
 elseif strcmp(Hx,'demo1')
   % If you run this again on the same date, we'll just add to THINI and
-  % THHAT but you will start with a blank THZERO. See 'demo2'
+  % THHAT but you will start with a blank THZRO. See 'demo2'
   % How many simulations? the second argument after the demo id
   defval('Gx',[]);
   N=Gx; clear Gx
@@ -297,7 +295,7 @@ elseif strcmp(Hx,'demo1')
   % Initialize the average Hessian
   avH=zeros(np,np);
 
-  % Set N to zero to simply close THZERO out
+  % Set N to zero to simply close THZRO out
   for index=1:N
     % Simulate data from the same lithosphere, watch the blurring
     [Hx,Gx,th0,p,k]=simulros(th0,params);
@@ -357,7 +355,7 @@ elseif strcmp(Hx,'demo1')
       end
     end
   end
-  % If there was any success at all, finalize the THZERO file
+  % If there was any success at all, finalize the THZRO file
   % If for some reason this didn't end well, do an N==0 run.
 
   % Initialize if all you want is to close the file
@@ -381,12 +379,12 @@ elseif strcmp(Hx,'demo1')
     % Of course when we don't have the truth we'll build the covariance
     % from the single estimate that we have just obtained. This
     % covariance would then be the only thing we'd have to save.
-    % if labindex==1
+    if labindex==1
         oswzeroe(fids(1),sclth0,avH,good,F,covF,fmti)
-    % end
+    end
   end
 
-  % Put both of these also into the thzro file 
+  % Put both of these also into the THZRO file 
   fclose('all');
 elseif strcmp(Hx,'demo2')
   defval('Gx',[]);
