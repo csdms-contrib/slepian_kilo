@@ -395,7 +395,7 @@ elseif strcmp(Hx,'demo2')
   np=6;
 
   % Load everything you know about this simulation
-  [th0,thhats,params,truecov,E,v,~,~,momx]=osload(datum);
+  [th0,thhats,params,truecov,~,~,E,v,~,~,momx]=osload(datum);
 
   % Report the findings of the moment parameters
   disp(sprintf('m(m(Xk)) %f m(v(Xk)) %f m(magic) %s v(magic) %f',...
@@ -418,7 +418,7 @@ elseif strcmp(Hx,'demo3')
   np=6;
 
   % Load everything you know about this simulation
-  [th0,thhats,params,truecov,E,v]=osload(datum);
+  [th0,thhats,params,truecov,~,~,E,v]=osload(datum);
 
   % Plot it all: one admittance/coherence curve for every estimate
   [ah,ha]=admiplos(thhats(randi(length(thhats),100,1),:),th0,truecov,E,v,params,[],length(thhats));
@@ -436,7 +436,7 @@ elseif strcmp(Hx,'demo4')
   np=6;
 
   % Load everything you know about this simulation
-  [th0,thhats,params,truecov,E,v,obscov,sclcov]=osload(datum);
+  [th0,thhats,params,truecov,~,~,E,v,obscov,sclcov]=osload(datum);
 
   % Make the plot
   ah=covplos(2,sclcov,obscov,truecov,params,thhats,th0,E,v,'ver');
