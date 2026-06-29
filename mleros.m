@@ -186,7 +186,7 @@ if ~isstr(Hx)
 
   % Set the parallel option to (never) use it for the actual optimization
   % Doesn't seem to do much when we supply our own gradient
-  if canUseParallelPool()
+  if canUseParallelPool
       options.UseParallel='always';
   end
 
