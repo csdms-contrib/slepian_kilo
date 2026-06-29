@@ -70,7 +70,7 @@ function varargout=mleros(Hx,Gx,thini,params,algo,bounds,aguess)
 % Attempting to find the density contrast and compensation level
 % mleros('demo7')
 %
-% Last modified by fjsimons-at-alum.mit.edu, 06/23/2026
+% Last modified by fjsimons-at-alum.mit.edu, 06/29/2026
 
 % NOTE: There are demonstrably bad solutions when r is close to 0 and f
 % is close to -1 and 1. Fix in bounding? Ignore, fix later? Also, keep
@@ -186,7 +186,9 @@ if ~isstr(Hx)
 
   % Set the parallel option to (never) use it for the actual optimization
   % Doesn't seem to do much when we supply our own gradient
-  options.UseParallel='always';
+  if canUseParallelPool()
+      options.UseParallel='always';
+  end
 
   if blurs==0 || blurs==1
     % Use the analytical gradient in the optimization, rarely a good idea
@@ -311,7 +313,7 @@ elseif strcmp(Hx,'demo1')
 
     % Initialize the THZRO file... note that the bounds may change
     % between simulations, and only one gets recorded here
-    if ~any(isnan(thhat)) && index==1 && labindex==1
+    if ~any(isnan(thhat)) && index==1 && canUseParallelPool && labindex==1
       oswzerob(fids(1),th0,p,lpars,fmts)
     end
 
