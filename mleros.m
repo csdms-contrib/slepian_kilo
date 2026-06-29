@@ -288,6 +288,11 @@ elseif strcmp(Hx,'demo1')
   % What fixed-parameter set? The FOURTH argument after the demo id
   defval('params',[]);
 
+  % Also work on puny computers
+  if ~canUseParallelPool
+      labindex=1;
+  end
+
   % The number of parameters to solve for
   np=6;
     
