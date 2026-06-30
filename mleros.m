@@ -411,7 +411,7 @@ elseif strcmp(Hx,'demo2')
 	      mean(momx),var(momx(:,end))))
 
   % Plot it all - perhaps some selection on optis?
-  [ah,ha]=mleplos(thhats,th0,covF0,covavhs,covXpix,E,v,params,sprintf('MLEROS-%s',datum));p
+  [ah,ha]=mleplos(thhats,th0,covF0,covavhs,covXpix,E,v,params,sprintf('MLEROS-%s',datum));
 
   % Print the figure! Don't forget the degs.pl script
   figna=figdisp([],sprintf('%s_%s',Hx,datum),[],1);
