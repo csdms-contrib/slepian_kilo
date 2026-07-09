@@ -70,7 +70,7 @@ function varargout=mleros(Hx,Gx,thini,params,algo,bounds,aguess)
 % Attempting to find the density contrast and compensation level
 % mleros('demo7')
 %
-% Last modified by fjsimons-at-alum.mit.edu, 06/29/2026
+% Last modified by fjsimons-at-alum.mit.edu, 07/08/2026
 
 % NOTE: There are demonstrably bad solutions when r is close to 0 and f
 % is close to -1 and 1. Fix in bounding? Ignore, fix later? Also, keep
@@ -448,7 +448,7 @@ elseif strcmp(Hx,'demo4')
   [th0,thhats,params,truecov,~,~,E,v,obscov,sclcov]=osload(datum);
 
   % Make the plot
-  ah=covplos(2,sclcov,obscov,truecov,params,thhats,th0,E,v,'ver');
+  ah=covplos(2,sclcov,obscov,params,thhats,E,v,'ver');
 
   figna=figdisp([],sprintf('%s_%s',Hx,datum),[],1);
   system(sprintf('epstopdf %s.eps',figna)); 
