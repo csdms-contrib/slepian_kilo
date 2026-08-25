@@ -108,41 +108,46 @@ if ~isstr(th0)
       % 	       mean(Z2(:)),std(Z2(:))))
       switch blurs
         case {0,1}
-          % disp(sprintf('%s without blurring',upper(mfilename)))
-          % Now make the spectral-spectral portion of the spectral matrix
-          % S11=maternos(k,th0);
-          S11=maternosp(th0,k,xver);
-          % The Cholesky decomposition of the lithospheric-spectral matrix
-          [~,~,L,T]=Tros(k,th0,params); 
-          % Roll in the sqrt of the factored portion
-          Lb=repmat(sqrt(S11),1,3).*L;
-          % The spectral matrix in case you might want it
-          Sb=[S11.*T(:,1) S11.*T(:,2) S11.*T(:,3)];
+          oldway=0;
+          if oldway==1
+              % disp(sprintf('%s without blurring',upper(mfilename)))
+              % Now make the spectral-spectral portion of the spectral matrix
+              S11=maternos(k,th0);
+              % The Cholesky decomposition of the lithospheric-spectral matrix
+              [~,~,L,T]=Tros(k,th0,params); 
+              % Roll in the sqrt of the factored portion
+              Lb=repmat(sqrt(S11),1,3).*L;
+              % The spectral matrix in case you might want it
+              Sb=[S11.*T(:,1) S11.*T(:,2) S11.*T(:,3)];
+          else
+              Sb=maternosp(th0,params,xver);
+          end
         otherwise
-          % If I stay on the same k-grid, I'm really not doing any convolution at
-          % all as you can see quickly. So by "suitably discretizing" the
-          % convolutional operator we mean performing it on a highly densified
-          % grid of which the target grid may be a subset. Doing this on the
-          % same grid would be the "inverse crime" of not changing the grid at
-          % all. Run Fk for this case to see it then would be a delta function
-
-          % disp(sprintf('%s with blurring factor %i',upper(mfilename),blurs))
-          % Blurs IS the refinement parameter; make new wavenumber grid
-          k2=knums(params,1);
-
-          % Now make the spectral-spectral portion of the spectral matrix
-          S11=maternos(k2,th0);
-          % The lithospheric-spectral matrix on this second grid
-          [~,~,~,T]=Tros(k2,th0,params); 
-          % Which we multiply by the spectral-spectral portion
-          S=[S11.*T(:,1) S11.*T(:,2) S11.*T(:,3)];
-          
-          % FJS should make the gravity BEFORE blurring says SCO
-          % SG2=[2*pi*G*DEL(2)*exp(-k(:).*z2)]   .*S(:,2);
-          % SG3=[2*pi*G*DEL(2)*exp(-k(:).*z2)].^2.*S(:,3);
-          
-          % Now do the blurring and subsampling/interpolation to original grid
-          Sb=bluros(S,params,xver);
+          if blurs>1 & ~isinf(blurs)
+              oldway=0;
+              if oldway==1
+                  k2=knums(params,1);
+                  S11=maternos(k2,th0);
+                  % The lithospheric-spectral matrix on this second grid
+                  [~,~,~,T]=Tros(k2,th0,params); 
+                  % Which we multiply by the spectral-spectral portion
+                  S=[S11.*T(:,1) S11.*T(:,2) S11.*T(:,3)];
+                  
+                  % FJS should make the gravity BEFORE blurring says SCO
+                  % SG2=[2*pi*G*DEL(2)*exp(-k(:).*z2)]   .*S(:,2);
+                  % SG3=[2*pi*G*DEL(2)*exp(-k(:).*z2)].^2.*S(:,3);
+                  
+                  % Now do the blurring and subsampling/interpolation to original grid
+                  Sb=bluros(S,params,xver);
+              else
+                  % We need the (blurred) power spectrum - the theoretical quantity
+                  Sb=maternosp(th0,params,xver);
+              end
+              % What if it is negative then deal with that
+              
+          end
+              
+          keyboard
           
           % And then we do the Cholesky decomposition of that, explicitly
           Lb=[sqrt(Sb(:,1)) Sb(:,2)./sqrt(Sb(:,1)) ...
@@ -193,7 +198,8 @@ if ~isstr(th0)
           diferm(Gk     -tospec(Gx     ,params),[],9-round(log10(mean(abs(Gk     )))));
       end
   else
-    % Make the Matern covariance OBJECT as required - vectorized
+      % Make the Matern covariance OBJECT as required - vectorized
+      % Calling it with Inf
       keyboard
   end
 
