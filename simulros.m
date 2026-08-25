@@ -10,20 +10,23 @@ function varargout=simulros(th0,params,xver)
 % INPUT:
 %
 % th0      The true parameter vector with elements:
-%          th(1)=D    Isotropic flexural rigidity 
-%          th(2)=f2   The sub-surface to surface initial loading ratio 
-%          th(3)=r    The sub-surface to surface initial correlation coefficient
-%          th(4)=s2   The first Matern parameter, aka sigma^2 
-%          th(5)=nu   The second Matern parameter 
-%          th(6)=rho  The third Matern parameter 
+%          th0(1)=D    Isotropic flexural rigidity 
+%          th0(2)=f2   The sub-surface to surface initial loading ratio 
+%          th0(3)=r    The sub-surface to surface initial correlation coefficient
+%          th0(4)=s2   The first Matern parameter, aka sigma^2, in field units^2 
+%          th0(5)=nu   The second Matern parameter 
+%          th0(6)=rho  The third Matern parameter, in the units of the grid 
 % params   A structure with constants that are (assumed to be) known:
 %          DEL   surface and subsurface density contrast [kg/m^3]
 %          g     gravitational acceleration [m/s^2]
 %          z2    the positive depth to the second interface [m]
 %          dydx  sampling interval in the y and x directions [m m]
 %          NyNx  number of samples in the y and x directions
-%          blurs 0 Don't blur likelihood using the Fejer window
-%                N Blur likelihood using the Fejer window [default: N=3]
+%          blurs  0 No wavenumber blurring
+%                 1 No wavenumber blurring, effectively
+%                 N Fejer convolutional  BLUROS  on an N-times refined grid
+%                -1 Fejer multiplicative BLUROSY using exact procedure
+%               Inf Simulate using SGP circulant embedding
 %          kiso  [immaterial whether this is here or not]
 %          quart 1 quadruple, then QUARTER [default]
 %                0 size as is, watch for periodic correlation behavior
@@ -56,12 +59,12 @@ function varargout=simulros(th0,params,xver)
 %
 % Last run on MATLAB Version: 9.7.0.1190202 (R2019b)
 %
-% Last modified by fjsimons-at-alum.mit.edu, 06/18/2026
+% Last modified by fjsimons-at-alum.mit.edu, 08/25/2026
 
 % Check how it behaves when NOT a power of two! FFT should still be exact
 % so wouldn't matter. Implement the windowing!
 
-% Here is the true parameter vector
+% Here is the true parameter vector and the only variable that gets used 
 defval('th0',[7e22 0.4 -0.75 0.0025 2 2e4]);
 
 % If not a demo...
@@ -84,95 +87,120 @@ if ~isstr(th0)
   end
 
   % First make the wavenumbers, given the data size and the data length
-  [k,dci,dcn]=knums(params);
-
-  % This should make sense as the spacing in wavenumber domain
-  dkxdky=2*pi./NyNx./dydx;
-
-  % Now construct the whole-spectral matrix
-  Z1=randgpn(k,dci,dcn);
-  Z2=randgpn(k,dci,dcn);
-  % This cramps the style
-  % disp(sprintf('Z1: mean %+6.3f ; stdev %6.3f',...
-  % 	       mean(Z1(:)),std(Z1(:))))
-  % disp(sprintf('Z2: mean %+6.3f ; stdev %6.3f',...
-  % 	       mean(Z2(:)),std(Z2(:))))
-  switch blurs
-   case {0,1}
-    % disp(sprintf('%s without blurring',upper(mfilename)))
-    % Now make the spectral-spectral portion of the spectral matrix
-    S11=maternos(k,th0);
-    % The Cholesky decomposition of the lithospheric-spectral matrix
-    [~,~,L,T]=Tros(k,th0,params); 
-    % Roll in the sqrt of the factored portion
-    Lb=repmat(sqrt(S11),1,3).*L;
-    % The spectral matrix in case you might want it
-    Sb=[S11.*T(:,1) S11.*T(:,2) S11.*T(:,3)];
-   otherwise
-    % If I stay on the same k-grid, I'm really not doing any convolution at
-    % all as you can see quickly. So by "suitably discretizing" the
-    % convolutional operator we mean performing it on a highly densified
-    % grid of which the target grid may be a subset. Doing this on the
-    % same grid would be the "inverse crime" of not changing the grid at
-    % all. Run Fk for this case to see it then would be a delta function
-
-    % disp(sprintf('%s with blurring factor %i',upper(mfilename),blurs))
-    % Blurs IS the refinement parameter; make new wavenumber grid
-    k2=knums(params,1);
-
-    % Now make the spectral-spectral portion of the spectral matrix
-    S11=maternos(k2,th0);
-    % The lithospheric-spectral matrix on this second grid
-    [~,~,~,T]=Tros(k2,th0,params); 
-    % Which we multiply by the spectral-spectral portion
-    S=[S11.*T(:,1) S11.*T(:,2) S11.*T(:,3)];
-    
-    % FJS should make the gravity BEFORE blurring says SCO
-    % SG2=[2*pi*G*DEL(2)*exp(-k(:).*z2)]   .*S(:,2);
-    % SG3=[2*pi*G*DEL(2)*exp(-k(:).*z2)].^2.*S(:,3);
-    
-    % Now do the blurring and subsampling/interpolation to original grid
-    Sb=bluros(S,params,xver);
-    
-    % And then we do the Cholesky decomposition of that, explicitly
-    Lb=[sqrt(Sb(:,1)) Sb(:,2)./sqrt(Sb(:,1)) ...
-	sqrt((Sb(:,1).*Sb(:,3)-Sb(:,2).^2)./Sb(:,1))];
-
-    % Should make sure that this is real! Why wouldn't it be?
-    Lb=realize(Lb);
-
-    if xver==1
-      cholcheck(Lb,Sb,6,1)
-      cholcheck(Lb,Sb,6,2)
-    end
-  end
-  % Blurred or unblurred, go on
-
-  % And put it all together, unwrapped over k and over x
-  Hk=[Lb(:,1).*Z1(:) [Lb(:,2).*Z1(:)+Lb(:,3).*Z2(:)]];
+  [k,dci,dcn,kx,ky]=knums(params);
   
-  % Without the L we should probably get the equilibrium topographies
-  % So for Airy icebergs we should just have a simple scaling?
-  if th0(1)==0 && th0(2)==0
-    % This should be 1
-    difer(Lb(:,1)-1,[],[],NaN)
-    % This should have some relation to airyratio
-    airyratio=DEL(1)/DEL(2);
-    difer(Lb(:,2)+airyratio,[],[],NaN)
-    % This should be 0
-    difer(Lb(:,3),[],[],NaN)
+  if xver
+    % This should make sense as the spacing in wavenumber domain
+    dkydkx=2*pi./NyNx./dydx;
+    diferm(unique(diff(ky))-dkydkx(1))
+    diferm(unique(diff(kx))-dkydkx(2))
   end
 
-  % FJS need to change this to blur the chi rather than chi the blur 03/19/2014
-  % With this sign convention the depth is positive
-  Gk=2*pi*G*DEL(2)*exp(-k(:).*z2).*Hk(:,2);
+  % Bypass this procedure altogether to go for circulant embedding
+  if ~isinf(params.blurs)
+      % Now construct the whole-spectral matrix
+      Z1=randgpn(k,dci,dcn);
+      Z2=randgpn(k,dci,dcn);
+      % This cramps the style But still. Should I put in a zero at dci? 
+      % disp(sprintf('Z1: mean %+6.3f ; stdev %6.3f',...
+      % 	       mean(Z1(:)),std(Z1(:))))
+      % disp(sprintf('Z2: mean %+6.3f ; stdev %6.3f',...
+      % 	       mean(Z2(:)),std(Z2(:))))
+      switch blurs
+        case {0,1}
+          % disp(sprintf('%s without blurring',upper(mfilename)))
+          % Now make the spectral-spectral portion of the spectral matrix
+          % S11=maternos(k,th0);
+          S11=maternosp(th0,k,xver);
+          % The Cholesky decomposition of the lithospheric-spectral matrix
+          [~,~,L,T]=Tros(k,th0,params); 
+          % Roll in the sqrt of the factored portion
+          Lb=repmat(sqrt(S11),1,3).*L;
+          % The spectral matrix in case you might want it
+          Sb=[S11.*T(:,1) S11.*T(:,2) S11.*T(:,3)];
+        otherwise
+          % If I stay on the same k-grid, I'm really not doing any convolution at
+          % all as you can see quickly. So by "suitably discretizing" the
+          % convolutional operator we mean performing it on a highly densified
+          % grid of which the target grid may be a subset. Doing this on the
+          % same grid would be the "inverse crime" of not changing the grid at
+          % all. Run Fk for this case to see it then would be a delta function
 
-  % And go to the space domain - unitary transform
-  Hx(:,1)=tospace(Hk(:,1),params);
-  Hx(:,2)=tospace(Hk(:,2),params);
-  Gx     =tospace(Gk     ,params);
-  
+          % disp(sprintf('%s with blurring factor %i',upper(mfilename),blurs))
+          % Blurs IS the refinement parameter; make new wavenumber grid
+          k2=knums(params,1);
+
+          % Now make the spectral-spectral portion of the spectral matrix
+          S11=maternos(k2,th0);
+          % The lithospheric-spectral matrix on this second grid
+          [~,~,~,T]=Tros(k2,th0,params); 
+          % Which we multiply by the spectral-spectral portion
+          S=[S11.*T(:,1) S11.*T(:,2) S11.*T(:,3)];
+          
+          % FJS should make the gravity BEFORE blurring says SCO
+          % SG2=[2*pi*G*DEL(2)*exp(-k(:).*z2)]   .*S(:,2);
+          % SG3=[2*pi*G*DEL(2)*exp(-k(:).*z2)].^2.*S(:,3);
+          
+          % Now do the blurring and subsampling/interpolation to original grid
+          Sb=bluros(S,params,xver);
+          
+          % And then we do the Cholesky decomposition of that, explicitly
+          Lb=[sqrt(Sb(:,1)) Sb(:,2)./sqrt(Sb(:,1)) ...
+	      sqrt((Sb(:,1).*Sb(:,3)-Sb(:,2).^2)./Sb(:,1))];
+
+          % Should make sure that this is real! Why wouldn't it be?
+          Lb=realize(Lb);
+
+          if xver==1
+              cholcheck(Lb,Sb,6,1)
+              cholcheck(Lb,Sb,6,2)
+          end
+      end
+      % Blurred or unblurred, go on
+
+      % And put it all together, unwrapped over k and over x
+      Hk=[Lb(:,1).*Z1(:) [Lb(:,2).*Z1(:)+Lb(:,3).*Z2(:)]];
+      
+      % Without the L we should probably get the equilibrium topographies
+      % So for Airy icebergs we should just have a simple scaling?
+      if th0(1)==0 && th0(2)==0
+          % This should be 1
+          difer(Lb(:,1)-1,[],[],NaN)
+          % This should have some relation to airyratio
+          airyratio=DEL(1)/DEL(2);
+          difer(Lb(:,2)+airyratio,[],[],NaN)
+          % This should be 0
+          difer(Lb(:,3),[],[],NaN)
+      end
+
+      % FJS need to change this to blur the chi rather than chi the blur 03/19/2014
+      % With this sign convention the depth is positive
+      Gk=2*pi*G*DEL(2)*exp(-k(:).*z2).*Hk(:,2);
+
+      % And go to the space domain - unitary transform
+      Hx(:,1)=tospace(Hk(:,1),params);
+      Hx(:,2)=tospace(Hk(:,2),params);
+      Gx     =tospace(Gk     ,params);
+
+      if xver==1
+          % Check Hermiticity before transformation, absolute tolerance
+          hermcheck(reshape(Hk(:,1),NyNx))
+          hermcheck(reshape(Hk(:,2),NyNx))
+          hermcheck(reshape(k      ,NyNx))
+          % Check unitarity of the transform; relative tolerance
+          diferm(Hk(:,1)-tospec(Hx(:,1),params),[],9-round(log10(mean(abs(Hk(:,1))))));
+          diferm(Hk(:,2)-tospec(Hx(:,2),params),[],9-round(log10(mean(abs(Hk(:,2))))));
+          diferm(Gk     -tospec(Gx     ,params),[],9-round(log10(mean(abs(Gk     )))));
+      end
+  else
+    % Make the Matern covariance OBJECT as required - vectorized
+      keyboard
+  end
+
   % Return the output if requested
+  defval('Hk',[])
+  defval('Sb',[])
+  defval('Lb',[])
   varns={Hx,Gx,th0,params,k,Hk,Gk,Sb,Lb};
   varargout=varns(1:nargout);
 elseif strcmp(th0,'demo1')
