@@ -108,19 +108,22 @@ if ~isstr(th0)
       % 	       mean(Z2(:)),std(Z2(:))))
       switch blurs
         case {0,1}
-          oldway=0;
+          oldway=1;
           if oldway==1
               % disp(sprintf('%s without blurring',upper(mfilename)))
               % Now make the spectral-spectral portion of the spectral matrix
               S11=maternos(k,th0);
-              % The Cholesky decomposition of the lithospheric-spectral matrix
-              [~,~,L,T]=Tros(k,th0,params); 
+              % The Cholesky decomposition of the unblurred lithospheric-spectral matrix
+              [~,~,L,T]=Tros(k,th0,params);
               % Roll in the sqrt of the factored portion
-              Lb=repmat(sqrt(S11),1,3).*L;
+              Lb=sqrt(S11).*L;
               % The spectral matrix in case you might want it
-              Sb=[S11.*T(:,1) S11.*T(:,2) S11.*T(:,3)];
+              Sb=S11.*T;
           else
-              Sb=maternosp(th0,params,xver);
+              % Hardly see why this is necessary
+              [Sb,k,L]=maternosp(th0,params,xver);
+              % Since this is the one we really want
+              Lb=sqrt(maternos(k,th0)).*L;
           end
         otherwise
           if blurs>1 & ~isinf(blurs)
@@ -129,9 +132,9 @@ if ~isstr(th0)
                   k2=knums(params,1);
                   S11=maternos(k2,th0);
                   % The lithospheric-spectral matrix on this second grid
-                  [~,~,~,T]=Tros(k2,th0,params); 
+                  [~,~,L,T]=Tros(k2,th0,params); 
                   % Which we multiply by the spectral-spectral portion
-                  S=[S11.*T(:,1) S11.*T(:,2) S11.*T(:,3)];
+                  S=S11.*T;
                   
                   % FJS should make the gravity BEFORE blurring says SCO
                   % SG2=[2*pi*G*DEL(2)*exp(-k(:).*z2)]   .*S(:,2);
@@ -144,12 +147,8 @@ if ~isstr(th0)
                   Sb=maternosp(th0,params,xver);
               end
               % What if it is negative then deal with that
-              
           end
-              
-          keyboard
-          
-          % And then we do the Cholesky decomposition of that, explicitly
+          % And then we do the Cholesky decomposition of the blurred lithospheric-spectral matrix, explicitly
           Lb=[sqrt(Sb(:,1)) Sb(:,2)./sqrt(Sb(:,1)) ...
 	      sqrt((Sb(:,1).*Sb(:,3)-Sb(:,2).^2)./Sb(:,1))];
 
@@ -200,6 +199,7 @@ if ~isstr(th0)
   else
       % Make the Matern covariance OBJECT as required - vectorized
       % Calling it with Inf
+      % Calling SGP then correlate then transform then times M then back to x
       keyboard
   end
 
