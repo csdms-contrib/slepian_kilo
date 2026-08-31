@@ -141,8 +141,8 @@ if ~isstr(th0)
                   % Now do the blurring and subsampling/interpolation to original grid
                   Sb=bluros(S,params,xver);
               else
-                  % Sb=bluros(S,params,xver);
                   % FJS should make the gravity BEFORE blurring says SCO
+                  % S=S11.*T;
                   % SG2=[2*pi*G*DEL(2)*exp(-k(:).*z2)]   .*S(:,2);
                   % SG3=[2*pi*G*DEL(2)*exp(-k(:).*z2)].^2.*S(:,3);
                   % Sb=bluros([S(:,1) SG2 SG3],params,xver);
