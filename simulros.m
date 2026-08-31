@@ -108,50 +108,27 @@ if ~isstr(th0)
       % 	       mean(Z2(:)),std(Z2(:))))
       switch blurs
         case {0,1}
-          oldway=1;
-          if oldway==1
-              % disp(sprintf('%s without blurring',upper(mfilename)))
-              % Now make the spectral-spectral portion of the spectral matrix
-              S11=maternos(k,th0);
-              % The Cholesky decomposition of the unblurred lithospheric-spectral matrix
-              [~,~,L,T]=Tros(k,th0,params);
-              % Roll in the sqrt of the factored portion
-              Lb=sqrt(S11).*L;
-              % The spectral matrix in case you might want it
-              Sb=S11.*T;
-          else
+          % disp(sprintf('%s without blurring',upper(mfilename)))
+          % Make the bivariate lithospheric coupling matrix
+          [~,~,L,T]=Tros(knums(params,1),th0,params);
+          % Hardly see why this is necessary
+          [Sb,k,L]=maternosp(th0,params,xver,[],T);
+          % Since this is the one we really want
+          Lb=sqrt(maternos(k,th0)).*L;
+        otherwise
+          % disp(sprintf('%s blurring',upper(mfilename)))
+          if blurs>1 & ~isinf(blurs)
+              % FJS should make the gravity BEFORE blurring says SCO
+              % S=S11.*T;
+              % SG2=[2*pi*G*DEL(2)*exp(-k(:).*z2)]   .*S(:,2);
+              % SG3=[2*pi*G*DEL(2)*exp(-k(:).*z2)].^2.*S(:,3);
+              % Sb=bluros([S(:,1) SG2 SG3],params,xver);
+              
               % Make the bivariate lithospheric coupling matrix
               [~,~,L,T]=Tros(knums(params,1),th0,params);
-              % Hardly see why this is necessary
-              [Sb,k,L]=maternosp(th0,params,xver,[],T);
-              % Since this is the one we really want
-              Lb=sqrt(maternos(k,th0)).*L;
-          end
-        otherwise
-          if blurs>1 & ~isinf(blurs)
-              oldway=0;
-              if oldway==1
-                  k2=knums(params,1);
-                  S11=maternos(k2,th0);
-                  % The lithospheric-spectral matrix on this second grid
-                  [~,~,L,T]=Tros(k2,th0,params); 
-                  % Which we multiply by the spectral-spectral portion
-                  S=S11.*T;
-                  
-                  % Now do the blurring and subsampling/interpolation to original grid
-                  Sb=bluros(S,params,xver);
-              else
-                  % FJS should make the gravity BEFORE blurring says SCO
-                  % S=S11.*T;
-                  % SG2=[2*pi*G*DEL(2)*exp(-k(:).*z2)]   .*S(:,2);
-                  % SG3=[2*pi*G*DEL(2)*exp(-k(:).*z2)].^2.*S(:,3);
-                  % Sb=bluros([S(:,1) SG2 SG3],params,xver);
-                  
-                  % Make the bivariate lithospheric coupling matrix
-                  [~,~,L,T]=Tros(knums(params,1),th0,params);
-                  % We need the (blurred) power spectrum - the theoretical quantity
-                  Sb=maternosp(th0,params,xver,[],T);
-              end
+              % We need the (blurred) power spectrum - the theoretical quantity
+              Sb=maternosp(th0,params,xver,[],T);
+              
               % What if it is negative then deal with that
           end
           % And then we do the Cholesky decomposition of the blurred lithospheric-spectral matrix, explicitly
