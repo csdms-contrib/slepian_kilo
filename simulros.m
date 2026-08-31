@@ -107,7 +107,7 @@ if ~isstr(th0)
       % disp(sprintf('Z2: mean %+6.3f ; stdev %6.3f',...
       % 	       mean(Z2(:)),std(Z2(:))))
 
-      % This handles all the cases 0, 1, >1 except Inf and -1
+      % This handles all the (un)blurred cases 0, 1, >1 except Inf and -1
       if blurs>=0
           % FJS should make the gravity BEFORE blurring says SCO
           % S=S11.*T;
@@ -119,6 +119,57 @@ if ~isstr(th0)
           [~,~,L,T]=Tros(knums(params,1),th0,params);
           % We need the (blurred) power spectrum - the theoretical quantity
           Sb=maternosp(th0,params,xver,[],T);
+
+          % And then we do the Cholesky decomposition of the blurred lithospheric-spectral matrix, explicitly
+          Lb=[sqrt(Sb(:,1)) Sb(:,2)./sqrt(Sb(:,1)) ...
+	      sqrt((Sb(:,1).*Sb(:,3)-Sb(:,2).^2)./Sb(:,1))];
+          
+          % Should make sure that this is real! Why wouldn't it be?
+          Lb=realize(Lb);
+          
+          if xver==1
+              cholcheck(Lb,Sb,6,1)
+              cholcheck(Lb,Sb,6,2)
+              % If it turns out to not have been blurred we did have an analytical way
+              if ismember(blurs,[0 1])
+                  diferm(Lb,sqrt(maternos(k,th0)).*L,7);
+              end
+          end
+          
+          % And put it all together, unwrapped over k and over x
+          Hk=[Lb(:,1).*Z1(:) [Lb(:,2).*Z1(:)+Lb(:,3).*Z2(:)]];
+          
+          % Without the L we should probably get the equilibrium topographies
+          % So for Airy icebergs we should just have a simple scaling?
+          if th0(1)==0 && th0(2)==0
+              % This should be 1
+              difer(Lb(:,1)-1,[],[],NaN)
+              % This should have some relation to airyratio
+              airyratio=DEL(1)/DEL(2);
+              difer(Lb(:,2)+airyratio,[],[],NaN)
+              % This should be 0
+              difer(Lb(:,3),[],[],NaN)
+          end
+          
+          % FJS need to change this to blur the chi rather than chi the blur 03/19/2014
+          % With this sign convention the depth is positive
+          Gk=2*pi*G*DEL(2)*exp(-k(:).*z2).*Hk(:,2);
+          
+          % And go to the space domain - unitary transform
+          Hx(:,1)=tospace(Hk(:,1),params);
+          Hx(:,2)=tospace(Hk(:,2),params);
+          Gx     =tospace(Gk     ,params);
+          
+          if xver==1
+              % Check Hermiticity before transformation, absolute tolerance
+              hermcheck(reshape(Hk(:,1),NyNx))
+              hermcheck(reshape(Hk(:,2),NyNx))
+              hermcheck(reshape(k      ,NyNx))
+              % Check unitarity of the transform; relative tolerance
+              diferm(Hk(:,1)-tospec(Hx(:,1),params),[],9-round(log10(mean(abs(Hk(:,1))))));
+              diferm(Hk(:,2)-tospec(Hx(:,2),params),[],9-round(log10(mean(abs(Hk(:,2))))));
+              diferm(Gk     -tospec(Gx     ,params),[],9-round(log10(mean(abs(Gk     )))));
+          end
       elseif blurs<0
           % What if it is negative then deal with that
           % Need a way to convert initial-topography space based covariance
@@ -126,66 +177,13 @@ if ~isstr(th0)
           % space-domain equation
           error('EXACT BLURRING Not ready yet')
       end
-
-      % And then we do the Cholesky decomposition of the blurred lithospheric-spectral matrix, explicitly
-      Lb=[sqrt(Sb(:,1)) Sb(:,2)./sqrt(Sb(:,1)) ...
-	  sqrt((Sb(:,1).*Sb(:,3)-Sb(:,2).^2)./Sb(:,1))];
-      
-      % Should make sure that this is real! Why wouldn't it be?
-      Lb=realize(Lb);
-
-      if xver==1
-          cholcheck(Lb,Sb,6,1)
-          cholcheck(Lb,Sb,6,2)
-          % If it turns out to not have been blurred we did have an analytical way
-          if ismember(blurs,[0 1])
-              diferm(Lb,sqrt(maternos(k,th0)).*L);
-          end
-      end
-
-      % Blurred or unblurred, go on
-
-      % And put it all together, unwrapped over k and over x
-      Hk=[Lb(:,1).*Z1(:) [Lb(:,2).*Z1(:)+Lb(:,3).*Z2(:)]];
-      
-      % Without the L we should probably get the equilibrium topographies
-      % So for Airy icebergs we should just have a simple scaling?
-      if th0(1)==0 && th0(2)==0
-          % This should be 1
-          difer(Lb(:,1)-1,[],[],NaN)
-          % This should have some relation to airyratio
-          airyratio=DEL(1)/DEL(2);
-          difer(Lb(:,2)+airyratio,[],[],NaN)
-          % This should be 0
-          difer(Lb(:,3),[],[],NaN)
-      end
-
-      % FJS need to change this to blur the chi rather than chi the blur 03/19/2014
-      % With this sign convention the depth is positive
-      Gk=2*pi*G*DEL(2)*exp(-k(:).*z2).*Hk(:,2);
-
-      % And go to the space domain - unitary transform
-      Hx(:,1)=tospace(Hk(:,1),params);
-      Hx(:,2)=tospace(Hk(:,2),params);
-      Gx     =tospace(Gk     ,params);
-
-      if xver==1
-          % Check Hermiticity before transformation, absolute tolerance
-          hermcheck(reshape(Hk(:,1),NyNx))
-          hermcheck(reshape(Hk(:,2),NyNx))
-          hermcheck(reshape(k      ,NyNx))
-          % Check unitarity of the transform; relative tolerance
-          diferm(Hk(:,1)-tospec(Hx(:,1),params),[],9-round(log10(mean(abs(Hk(:,1))))));
-          diferm(Hk(:,2)-tospec(Hx(:,2),params),[],9-round(log10(mean(abs(Hk(:,2))))));
-          diferm(Gk     -tospec(Gx     ,params),[],9-round(log10(mean(abs(Gk     )))));
-      end
   else
       % Make the Matern covariance OBJECT as required - vectorized
       % Calling it with Inf
       % Calling SGP then correlate then transform then times M then back to x
       keyboard
   end
-
+  
   % Return the output if requested
   defval('Hk',[])
   defval('Sb',[])
