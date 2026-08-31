@@ -142,7 +142,7 @@ if ~isstr(th0)
               diferm(Lb,sqrt(maternos(k,th0)).*L);
           end
       end
-  end
+
       % Blurred or unblurred, go on
 
       % And put it all together, unwrapped over k and over x
