@@ -120,8 +120,10 @@ if ~isstr(th0)
               % The spectral matrix in case you might want it
               Sb=S11.*T;
           else
+              % Make the bivariate lithospheric coupling matrix
+              [~,~,L,T]=Tros(knums(params,1),th0,params);
               % Hardly see why this is necessary
-              [Sb,k,L]=maternosp(th0,params,xver);
+              [Sb,k,L]=maternosp(th0,params,xver,[],T);
               % Since this is the one we really want
               Lb=sqrt(maternos(k,th0)).*L;
           end
@@ -143,8 +145,10 @@ if ~isstr(th0)
                   % Now do the blurring and subsampling/interpolation to original grid
                   Sb=bluros(S,params,xver);
               else
+                  % Make the bivariate lithospheric coupling matrix
+                  [~,~,L,T]=Tros(knums(params,1),th0,params);
                   % We need the (blurred) power spectrum - the theoretical quantity
-                  Sb=maternosp(th0,params,xver);
+                  Sb=maternosp(th0,params,xver,[],T);
               end
               % What if it is negative then deal with that
           end
