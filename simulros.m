@@ -90,7 +90,7 @@ if ~isstr(th0)
   [k,dci,dcn,kx,ky]=knums(params);
   
   if xver
-    % This should make sense as the spacing in wavenumber domain
+    % this should make sense as the spacing in wavenumber domain
     dkydkx=2*pi./NyNx./dydx;
     diferm(unique(diff(ky))-dkydkx(1))
     diferm(unique(diff(kx))-dkydkx(2))
@@ -106,43 +106,43 @@ if ~isstr(th0)
       % 	       mean(Z1(:)),std(Z1(:))))
       % disp(sprintf('Z2: mean %+6.3f ; stdev %6.3f',...
       % 	       mean(Z2(:)),std(Z2(:))))
-      switch blurs
-        case {0,1}
-          % disp(sprintf('%s without blurring',upper(mfilename)))
+
+      % This handles all the cases 0, 1, >1 except Inf and -1
+      if blurs>=0
+          % FJS should make the gravity BEFORE blurring says SCO
+          % S=S11.*T;
+          % SG2=[2*pi*G*DEL(2)*exp(-k(:).*z2)]   .*S(:,2);
+          % SG3=[2*pi*G*DEL(2)*exp(-k(:).*z2)].^2.*S(:,3);
+          % Sb=bluros([S(:,1) SG2 SG3],params,xver);
+          
           % Make the bivariate lithospheric coupling matrix
           [~,~,L,T]=Tros(knums(params,1),th0,params);
-          % Hardly see why this is necessary
-          [Sb,k,L]=maternosp(th0,params,xver,[],T);
-          % Since this is the one we really want
-          Lb=sqrt(maternos(k,th0)).*L;
-        otherwise
-          % disp(sprintf('%s blurring',upper(mfilename)))
-          if blurs>1 & ~isinf(blurs)
-              % FJS should make the gravity BEFORE blurring says SCO
-              % S=S11.*T;
-              % SG2=[2*pi*G*DEL(2)*exp(-k(:).*z2)]   .*S(:,2);
-              % SG3=[2*pi*G*DEL(2)*exp(-k(:).*z2)].^2.*S(:,3);
-              % Sb=bluros([S(:,1) SG2 SG3],params,xver);
-              
-              % Make the bivariate lithospheric coupling matrix
-              [~,~,L,T]=Tros(knums(params,1),th0,params);
-              % We need the (blurred) power spectrum - the theoretical quantity
-              Sb=maternosp(th0,params,xver,[],T);
-              
-              % What if it is negative then deal with that
-          end
-          % And then we do the Cholesky decomposition of the blurred lithospheric-spectral matrix, explicitly
-          Lb=[sqrt(Sb(:,1)) Sb(:,2)./sqrt(Sb(:,1)) ...
-	      sqrt((Sb(:,1).*Sb(:,3)-Sb(:,2).^2)./Sb(:,1))];
+          % We need the (blurred) power spectrum - the theoretical quantity
+          Sb=maternosp(th0,params,xver,[],T);
+      elseif blurs<0
+          % What if it is negative then deal with that
+          % Need a way to convert initial-topography space based covariance
+          % to final-interface space-based covariance i.e. through solving the
+          % space-domain equation
+          error('EXACT BLURRING Not ready yet')
+      end
 
-          % Should make sure that this is real! Why wouldn't it be?
-          Lb=realize(Lb);
+      % And then we do the Cholesky decomposition of the blurred lithospheric-spectral matrix, explicitly
+      Lb=[sqrt(Sb(:,1)) Sb(:,2)./sqrt(Sb(:,1)) ...
+	  sqrt((Sb(:,1).*Sb(:,3)-Sb(:,2).^2)./Sb(:,1))];
+      
+      % Should make sure that this is real! Why wouldn't it be?
+      Lb=realize(Lb);
 
-          if xver==1
-              cholcheck(Lb,Sb,6,1)
-              cholcheck(Lb,Sb,6,2)
+      if xver==1
+          cholcheck(Lb,Sb,6,1)
+          cholcheck(Lb,Sb,6,2)
+          % If it turns out to not have been blurred we did have an analytical way
+          if ismember(blurs,[0 1])
+              diferm(Lb,sqrt(maternos(k,th0)).*L);
           end
       end
+  end
       % Blurred or unblurred, go on
 
       % And put it all together, unwrapped over k and over x
